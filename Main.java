@@ -66,7 +66,7 @@ public class Main {
                 }
             }
 
-            if (s.charAt(i) == '1') {
+            if (s.charAt(i) == '1' && flag == 0) {
                 flag = 1;
             }
 
@@ -99,6 +99,16 @@ public class Main {
         //no of bits
         int n=0;
         boolean negflag=false;
+
+        if(divisor==0){
+            System.out.println("You can't divide a number by zero.");
+            System.exit(0);
+        }
+
+        if(dividend < divisor){
+            System.out.println("Divisor should be smaller than dividend");
+            System.exit(0);
+        }
 
         if((dividend<0 && divisor>0) || (dividend>0 && divisor<0) ){
             dividend = Math.abs(dividend);
@@ -190,6 +200,152 @@ public class Main {
 
     }
 
+    public static void multiplication(int multiplicand, int multiplier) {
+        // flag for negative numbers.
+        boolean negflag = false;
+        // if any of number is ngative.
+        if ((multiplicand < 0 && multiplier > 0) || (multiplicand > 0 && multiplier < 0)) {
+            multiplicand = Math.abs(multiplicand);
+            multiplier = Math.abs(multiplier);
+            negflag = true;
+        }
+        // if both the numbers is negative.
+        if (multiplicand < 0 && multiplier < 0) {
+            multiplicand = Math.abs(multiplicand);
+            multiplier = Math.abs(multiplier);
+        }
+
+        int n = 0;
+        if (multiplicand > multiplier) {
+            String temp = Integer.toBinaryString(multiplicand);
+            n = temp.length();
+        } else if (multiplicand < multiplier) {
+            String temp = Integer.toBinaryString(multiplier);
+            n = temp.length();
+        } else if (multiplicand == multiplier) {
+            String temp = Integer.toBinaryString(multiplicand);
+            n = temp.length();
+        }
+
+        // multiplicand
+        String M = intToBinary(multiplicand, n + 1);
+        String minusM = twoscompliment(M);
+        // multiplier
+        String Q = intToBinary(multiplier, n);
+
+        //Accumulator
+        String AC = intToBinary(0, n + 1);
+
+        String Qnp1 = "0";
+
+        String Qn = Q;
+        n++;
+        int cycle = n;
+
+        appendStrToFile("multiplication.txt", "Accumulator                    Multiplier(Qn)                 Qnp1                   Operation");
+        appendStrToFile("multiplication.txt", "\n");
+        appendStrToFile("multiplication.txt", "\n");
+        appendStrToFile("multiplication.txt", AC + "                                " + Qn + "                         " + Qnp1 + "                    " + "Initially");
+        appendStrToFile("multiplication.txt", "\n");
+        appendStrToFile("multiplication.txt", "\n");
+        while (cycle-- > 0) {
+            appendStrToFile("multiplication.txt", "Cycle - " + (n - cycle));
+            appendStrToFile("multiplication.txt", "\n");
+
+            if ((Qn.charAt(Qn.length() - 1) + Qnp1).equals("10")) {
+                AC = addBinary(AC, minusM);
+                appendStrToFile("multiplication.txt", AC + "                                " + Qn + "                        " + Qnp1 + "                    " + "AC = AC - M");
+                appendStrToFile("multiplication.txt", "\n");
+
+                String values[] = Arithmetic_Shift_Right(AC, Qn, Qnp1, n);
+                AC = values[0];
+                Qn = values[1];
+                Qnp1 = values[2];
+                appendStrToFile("multiplication.txt", AC + "                                " + Qn + "                        " + Qnp1 + "                    " + "ASR");
+                appendStrToFile("multiplication.txt", "\n");
+                appendStrToFile("multiplication.txt", "\n");
+            } else if ((Qn.charAt(Qn.length() - 1) == '1') && Qnp1.equals("1")) {
+                String values[] = Arithmetic_Shift_Right(AC, Qn, Qnp1, n);
+                AC = values[0];
+                Qn = values[1];
+                Qnp1 = values[2];
+                appendStrToFile("multiplication.txt", AC + "                                " + Qn + "                        " + Qnp1 + "                    " + "ASR");
+                appendStrToFile("multiplication.txt", "\n");
+                appendStrToFile("multiplication.txt", "\n");
+            } else if ((Qn.charAt(Qn.length() - 1) == '0') && Qnp1.equals("0")) {
+                String values[] = Arithmetic_Shift_Right(AC, Qn, Qnp1, n);
+                AC = values[0];
+                Qn = values[1];
+                Qnp1 = values[2];
+                appendStrToFile("multiplication.txt", AC + "                                " + Qn + "                        " + Qnp1 + "                    " + "ASR");
+                appendStrToFile("multiplication.txt", "\n");
+                appendStrToFile("multiplication.txt", "\n");
+            } else if ((Qn.charAt(Qn.length() - 1) + Qnp1).equals("01")) {
+                AC = addBinary(AC, M);
+                appendStrToFile("multiplication.txt", AC + "                                " + Qn + "                       " + Qnp1 + "                    " + "AC = AC + M");
+                appendStrToFile("multiplication.txt", "\n");
+
+                String values[] = Arithmetic_Shift_Right(AC, Qn, Qnp1, n);
+                AC = values[0];
+                Qn = values[1];
+                Qnp1 = values[2];
+                appendStrToFile("multiplication.txt", AC + "                                " + Qn + "                        " + Qnp1 + "                    " + "ASR");
+                appendStrToFile("multiplication.txt", "\n");
+                appendStrToFile("multiplication.txt", "\n");
+            }
+        }
+
+        appendStrToFile("multiplication.txt", "\n");
+        appendStrToFile("multiplication.txt", "Multiplication Result:");
+        appendStrToFile("multiplication.txt", "\n");
+        String result = AC.concat(Qn);
+        if (negflag) {
+            System.out.println("In Binary Form : " + twoscompliment(result));
+            System.out.println("In Decimal Form : " + "-" + binToint(result));
+            appendStrToFile("multiplication.txt", "In Binary Form : " + twoscompliment(result));
+            appendStrToFile("multiplication.txt", "\nIn Decimal Form : " + "-" + binToint(result));
+
+        } else {
+            System.out.println("In Binary Form : " + result);
+            System.out.println("In Decimal Form : " + binToint(result));
+            appendStrToFile("multiplication.txt", "In Binary Form : " + result);
+            appendStrToFile("multiplication.txt", "\nIn Decimal Form : " + binToint(result));
+
+        }
+
+        appendStrToFile("multiplication.txt", "\n");
+        appendStrToFile("multiplication.txt", "\n");
+        appendStrToFile("multiplication.txt", "\n");
+        appendStrToFile("multiplication.txt", "\n");
+        appendStrToFile("multiplication.txt", "\n");
+    }
+
+
+
+    public static String[] Arithmetic_Shift_Right(String AC, String multiplier, String qm1, int count) {
+        qm1 = "" + multiplier.charAt(multiplier.length() - 1);
+
+        int ac = Integer.parseInt(AC, 2);
+        ac = ac >> 1;
+        String ac1 = intToBinary(ac, count);
+        StringBuffer AC1 = new StringBuffer(ac1);
+
+        int m = Integer.parseInt(multiplier, 2);
+        m = m >> 1;
+        String m1 = intToBinary(m, count);
+        StringBuffer multiplier1 = new StringBuffer(m1);
+
+        multiplier1.replace(0, 1, "" + AC.charAt(AC.length() - 1));
+
+        if (AC.length() > 1) {
+            AC1.replace(0, 1, "" + AC1.charAt(1));
+        }
+
+        String r[] = {AC1.toString(), multiplier1.toString(), qm1};
+        return r;
+
+    }
+
     public static void main(String[] args) {
 
         Scanner scan = new Scanner(System.in);
@@ -203,7 +359,7 @@ public class Main {
 
         int option=scan.nextInt();
         if(option==1){
-
+            multiplication(a, b);
         }
         else if(option==2){
             divide(a,b);
